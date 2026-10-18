@@ -26,8 +26,66 @@
   --shadow-sm: 0 2px 8px rgba(29, 31, 32, 0.04);
   --shadow-md: 0 4px 24px rgba(29, 31, 32, 0.06);
   --shadow-lg: 0 12px 40px rgba(29, 31, 32, 0.1);
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-editorial: 'Instrument Serif', 'Playfair Display', Georgia, serif;
+  --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-editorial: 'Instrument Serif', Georgia, serif;
+  --font-hand: 'Caveat', cursive;
+
+  /* Obsidian Studio Dark Base */
+  --studio-bg: #0A0A0A;
+  --studio-surface: #111111;
+  --studio-panel: #1A1A1A;
+  --studio-input: #232323;
+  --studio-pill: rgba(255, 255, 255, 0.06);
+
+  /* Hairline Borders */
+  --border-highlight: rgba(255, 255, 255, 0.16);
+
+  /* High-Chroma Accent Sparks */
+  --accent-sky: #38BDF8;
+  --accent-violet: #8B5CF6;
+  --accent-teal: #36B5A2;
+  --accent-coral: #FF5A6A;
+  --accent-sunset: #F99F3F;
+  --accent-cobalt: #1212FF;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .grain-overlay {
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+    animation: grain-anim 0.6s steps(5) infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay { display: none; }
+}
+@keyframes grain-anim {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-10%, 5%); }
+  40% { transform: translate(5%, -10%); }
+  60% { transform: translate(-5%, 10%); }
+  80% { transform: translate(10%, -5%); }
+  100% { transform: translate(0, 0); }
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  transform: rotate(-2deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button, .btn, .card, .feature-tile {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
 * {
