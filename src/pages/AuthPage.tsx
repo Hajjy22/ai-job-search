@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FileText } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 export default function AuthPage({ mode }: { mode: 'signin' | 'signup' }) {
@@ -8,119 +7,70 @@ export default function AuthPage({ mode }: { mode: 'signin' | 'signup' }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [businessName, setBusinessName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-
-  const isSignup = mode === 'signup'
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
-      return
-    }
-
     setBusy(true)
-
-    if (isSignup) {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: fullName, business_name: businessName },
-        },
-      })
-      if (signUpError) {
-        setError(
-          signUpError.message === 'User already registered'
-            ? 'An account with this email already exists. Try signing in.'
-            : signUpError.message
-        )
-        setBusy(false)
-        return
+    try {
+      if (mode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName } },
+        })
+        if (error) throw error
+        navigate('/dashboard')
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+        navigate('/dashboard')
       }
-      // Ensure profile exists (trigger covers it; this backfills name fields)
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            email: user.email ?? email,
-            full_name: fullName || null,
-            business_name: businessName || null,
-          }, { onConflict: 'id' })
-      }
-    } else {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (signInError) {
-        setError(
-          signInError.message.includes('Invalid login')
-            ? 'Incorrect email or password.'
-            : signInError.message
-        )
-        setBusy(false)
-        return
-      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    } finally {
+      setBusy(false)
     }
-
-    setBusy(false)
-    navigate('/dashboard')
   }
 
   return (
     <div className="auth-page">
       <div className="card auth-card">
         <div className="auth-logo">
-          <FileText size={26} />
-          InvoiceFlow
+          <img src="/logo.svg" alt="Bragit" width={32} height={32} />
+          Bragit
         </div>
         <p className="auth-sub">
-          {isSignup
-            ? 'Create your free account — no credit card needed.'
-            : 'Welcome back. Sign in to manage your invoices.'}
+          {mode === 'signin'
+            ? 'Welcome back. Your pipeline is waiting.'
+            : 'Create your account and start your AI-powered job search.'}
         </p>
-
+        {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
-          {isSignup && (
-            <>
-              <div className="field">
-                <label htmlFor="fullName">Your name</label>
-                <input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Rivera"
-                  autoComplete="name"
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="businessName">Business name (optional)</label>
-                <input
-                  id="businessName"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Rivera Design Studio"
-                  autoComplete="organization"
-                />
-              </div>
-            </>
+          {mode === 'signup' && (
+            <div className="field">
+              <label htmlFor="fullName">Full name</label>
+              <input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Alex Johnson"
+                required
+              />
+            </div>
           )}
           <div className="field">
             <label htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
+              required
               autoComplete="email"
             />
           </div>
@@ -129,26 +79,23 @@ export default function AuthPage({ mode }: { mode: 'signin' | 'signup' }) {
             <input
               id="password"
               type="password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
-              autoComplete={isSignup ? 'new-password' : 'current-password'}
+              placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+              required
+              minLength={6}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
             />
           </div>
-
-          {error && <div className="form-error">{error}</div>}
-
           <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
-            {busy ? 'Please wait…' : isSignup ? 'Create free account' : 'Sign in'}
+            {busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
           </button>
         </form>
-
         <p className="auth-alt">
-          {isSignup ? (
-            <>Already have an account? <Link to="/signin">Sign in</Link></>
+          {mode === 'signin' ? (
+            <>No account yet? <Link to="/signup">Sign up free</Link></>
           ) : (
-            <>New to InvoiceFlow? <Link to="/signup">Create a free account</Link></>
+            <>Already have an account? <Link to="/signin">Sign in</Link></>
           )}
         </p>
       </div>

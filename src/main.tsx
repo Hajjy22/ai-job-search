@@ -4,12 +4,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import AppLayout from './components/AppLayout'
+import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
-import InvoicesPage from './pages/InvoicesPage'
-import InvoiceEditorPage from './pages/InvoiceEditorPage'
-import InvoiceDetailPage from './pages/InvoiceDetailPage'
-import ClientsPage from './pages/ClientsPage'
+import JobsPage from './pages/JobsPage'
+import JobDetailPage from './pages/JobDetailPage'
+import ApplicationsPage from './pages/ApplicationsPage'
+import DocumentsPage from './pages/DocumentsPage'
 import SettingsPage from './pages/SettingsPage'
 import PricingPage from './pages/PricingPage'
 
@@ -50,17 +51,17 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signin" element={<PublicOnly><AuthPage mode="signin" /></PublicOnly>} />
           <Route path="/signup" element={<PublicOnly><AuthPage mode="signup" /></PublicOnly>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/dashboard" element={<Protected><DashboardPage /></Protected>} />
-          <Route path="/invoices" element={<Protected><InvoicesPage /></Protected>} />
-          <Route path="/invoices/new" element={<Protected><InvoiceEditorPage mode="create" /></Protected>} />
-          <Route path="/invoices/:id" element={<Protected><InvoiceDetailPage /></Protected>} />
-          <Route path="/invoices/:id/edit" element={<Protected><InvoiceEditorPage mode="edit" /></Protected>} />
-          <Route path="/clients" element={<Protected><ClientsPage /></Protected>} />
+          <Route path="/jobs" element={<Protected><JobsPage /></Protected>} />
+          <Route path="/jobs/:id" element={<Protected><JobDetailPage /></Protected>} />
+          <Route path="/applications" element={<Protected><ApplicationsPage /></Protected>} />
+          <Route path="/documents" element={<Protected><DocumentsPage /></Protected>} />
           <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
