@@ -1,15 +1,12 @@
 import { Link } from 'react-router-dom'
 import {
-  Target, KanbanSquare, FileText, Check, ArrowRight,
+  Target, KanbanSquare, FileText, Check, ArrowRight, Play,
   Search, Gauge, Zap, Menu, X, Star,
+  MessageSquare, LayoutGrid, Scissors, Palette, FolderOpen,
+  Sparkles, Paperclip, ArrowUp, Download,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-
-const STYLE_PRESETS = [
-  'Prism Pro', 'Paper II', 'Prime', 'Elevate', 'Impact II',
-  'Sketch', 'Lens', 'Vista', 'Pop', 'Orbit', 'Y2K', 'Form',
-]
 
 const features = [
   {
@@ -111,139 +108,232 @@ const faqs = [
   },
 ]
 
+const bentoCards = [
+  {
+    title: 'Dynamic fit breakdowns',
+    desc: 'Every score comes with a transparent breakdown — matched skills, gaps, and salary alignment — rendered as clean, animated captions.',
+    visual: 'captions',
+  },
+  {
+    title: 'Side-by-side role compare',
+    desc: 'Stack two postings next to each other and watch Bragit highlight where you fit stronger and where you need to stretch.',
+    visual: 'split',
+  },
+  {
+    title: 'Application rhythm',
+    desc: 'A scrubable timeline of your search cadence — when you applied, followed up, and heard back — so you never lose momentum.',
+    visual: 'waveform',
+  },
+  {
+    title: 'Pipeline that tells a story',
+    desc: 'From saved to signed, every stage is visual. Drag a card and the whole funnel reshuffles in real time.',
+    visual: 'pipeline',
+  },
+  {
+    title: 'One number that means something',
+    desc: 'The fit score isn\'t a black box. It\'s a weighted read of your skills, experience, and preferences against the posting in front of you.',
+    visual: 'score',
+  },
+]
+
+const navLinks = [
+  { label: 'Features', href: '#features' },
+  { label: 'AI Studio', href: '#studio' },
+  { label: 'Showcase', href: '#showcase' },
+  { label: 'Pricing', to: '/pricing' },
+]
+
 export default function LandingPage() {
   const { session } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
-  const [activeStyle, setActiveStyle] = useState(STYLE_PRESETS[0])
 
   return (
     <div className="landing">
-      <header className={`landing-topbar${menuOpen ? ' open' : ''}`}>
-        <div className="container landing-nav">
-          <Link to="/" className="landing-logo">
-            <img src="/logo.svg" alt="Bragit" width={28} height={28} />
-            Bragit
-          </Link>
-          <nav className="landing-links">
-            <a href="#features">Features</a>
-            <a href="#how">How it works</a>
-            <a href="#testimonials">Loved by hunters</a>
-            <Link to="/pricing">Pricing</Link>
-          </nav>
-          <div className="landing-cta-group">
-            {session ? (
-              <Link to="/dashboard" className="btn btn-primary btn-sm">Open dashboard</Link>
+      {/* Step 2: Floating Glass Pill Navbar */}
+      <nav className="glass-nav" aria-label="Primary">
+        <Link to="/" className="landing-logo" style={{ flexShrink: 0 }}>
+          <img src="/logo.svg" alt="Bragit" width={26} height={26} />
+          Bragit
+        </Link>
+        <div className="glass-nav-links">
+          {navLinks.map((l) =>
+            l.href ? (
+              <a key={l.label} href={l.href}>{l.label}</a>
             ) : (
-              <>
-                <Link to="/signin" className="landing-signin">Sign in</Link>
-                <Link to="/signup" className="btn btn-primary btn-sm">Start free</Link>
-              </>
-            )}
-            <button className="landing-burger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
+              <Link key={l.label} to={l.to!}>{l.label}</Link>
+            )
+          )}
         </div>
-        {menuOpen && (
-          <div className="landing-mobile-menu">
-            <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
-            <a href="#how" onClick={() => setMenuOpen(false)}>How it works</a>
-            <a href="#testimonials" onClick={() => setMenuOpen(false)}>Loved by hunters</a>
-            <Link to="/pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
-          </div>
-        )}
-      </header>
+        <div className="glass-nav-right">
+          {session ? (
+            <Link to="/dashboard" className="glass-nav-cta shimmer">Open dashboard</Link>
+          ) : (
+            <>
+              <Link to="/signin" className="glass-nav-login">Log in</Link>
+              <Link to="/signup" className="glass-nav-cta shimmer">Start free</Link>
+            </>
+          )}
+          <button
+            className="glass-burger"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+      </nav>
+      {menuOpen && (
+        <div className="glass-nav-mobile">
+          {navLinks.map((l) =>
+            l.href ? (
+              <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</a>
+            ) : (
+              <Link key={l.label} to={l.to!} onClick={() => setMenuOpen(false)}>{l.label}</Link>
+            )
+          )}
+          {!session && (
+            <Link to="/signin" onClick={() => setMenuOpen(false)} style={{ fontWeight: 600 }}>Log in</Link>
+          )}
+        </div>
+      )}
 
       <main>
-        {/* Hero */}
-        <section className="hero">
-          <div className="container">
-            <div className="hero-pill">
-              <span className="pulse-dot" /> AI that hunts like a recruiter would.
-            </div>
-            <h1>
-              Land your next role, <br />
-              <span className="hero-gradient">without the chaos.</span>
-            </h1>
-            <p className="hero-sub">
-              Paste any job posting and Bragit scores your fit, explains why,
-              and tracks the application from first click to signed offer —
-              so you spend your energy on interviews, not spreadsheets.
-            </p>
-            <div className="hero-cta-row">
-              <Link to="/signup" className="btn btn-primary btn-lg">
-                Start free <ArrowRight size={17} />
-              </Link>
-              <a href="#how" className="btn btn-ghost btn-lg">See how it works</a>
-            </div>
-            <p className="hero-note">Free plan · No credit card required</p>
+        {/* Step 3: Editorial Hero */}
+        <section className="editorial-hero">
+          <div className="hero-orb hero-orb-violet" aria-hidden="true" />
+          <div className="hero-orb hero-orb-cyan" aria-hidden="true" />
+          <div className="hero-announce" style={{ position: 'relative' }}>
+            <span className="hero-announce-badge">New</span>
+            The job search copilot that learns your style
+          </div>
+          <h1 className="editorial-headline">
+            Land your next role with<br />
+            a search that <span className="hand-accent">thinks</span> ahead
+          </h1>
+          <p className="editorial-sub">
+            Paste any job posting and Bragit scores your fit, explains why,
+            and tracks the application from first click to signed offer —
+            so you spend your energy on interviews, not spreadsheets.
+          </p>
+          <div className="editorial-cta-row">
+            <Link to="/signup" className="btn-pill-dark">
+              Start free <ArrowRight size={16} />
+            </Link>
+            <a href="#studio" className="btn-pill-frost">
+              <Play size={15} /> Watch 1-min demo
+            </a>
+          </div>
+        </section>
 
-            {/* Style bar */}
-            <div className="style-bar no-scrollbar">
-              {STYLE_PRESETS.map((styleName) => (
-                <button
-                  key={styleName}
-                  onClick={() => setActiveStyle(styleName)}
-                  className={`style-chip${activeStyle === styleName ? ' active' : ''}`}
-                >
-                  {styleName}
+        {/* Step 4: Obsidian AI Studio */}
+        <section id="studio" className="studio-wrap" style={{ marginTop: 8, marginBottom: 16 }}>
+          <div className="studio-frame">
+            <div className="studio-shell">
+              <div className="studio-header">
+                <div className="studio-header-left">
+                  <FileText size={14} />
+                  <span>Bragit Search Session.md</span>
+                  <span className="studio-status-dot" />
+                  <span className="studio-status-label">Agent Active</span>
+                </div>
+                <button className="studio-export">
+                  <Download size={12} /> Export
                 </button>
-              ))}
-            </div>
-
-            {/* Product mockup */}
-            <div className="hero-mockup">
-              <div className="mockup-bar">
-                <span className="mockup-dot red" />
-                <span className="mockup-dot amber" />
-                <span className="mockup-dot green" />
-                <span className="mockup-title">app.bragit.xyz — dashboard</span>
               </div>
-              <div className="mockup-body">
-                <div className="mockup-side">
-                  <div className="mockup-nav active">Dashboard</div>
-                  <div className="mockup-nav">Job Board</div>
-                  <div className="mockup-nav">Pipeline</div>
-                  <div className="mockup-nav">Documents</div>
-                </div>
-                <div className="mockup-main">
-                  <div className="mockup-stats">
-                    <div className="mockup-stat"><span>Jobs</span><strong>24</strong></div>
-                    <div className="mockup-stat"><span>Applied</span><strong>9</strong></div>
-                    <div className="mockup-stat"><span>Interviews</span><strong>3</strong></div>
-                    <div className="mockup-stat"><span>Avg fit</span><strong>82</strong></div>
+              <div className="studio-body">
+                {/* Left: AI Assistant Panel */}
+                <div className="studio-left">
+                  <div className="studio-dock">
+                    <button className="studio-dock-btn active"><MessageSquare size={16} />Chat</button>
+                    <button className="studio-dock-btn"><LayoutGrid size={16} />Storyboard</button>
+                    <button className="studio-dock-btn"><Scissors size={16} />Cuts</button>
+                    <button className="studio-dock-btn"><Palette size={16} />Styles</button>
+                    <button className="studio-dock-btn"><FolderOpen size={16} />Assets</button>
                   </div>
-                  <div className="mockup-rows">
-                    {[
-                      { t: 'Senior Product Engineer', c: 'Linear', s: 92, stage: 'Interview' },
-                      { t: 'Staff Frontend Engineer', c: 'Vercel', s: 87, stage: 'Applied' },
-                      { t: 'Design Engineer', c: 'Stripe', s: 84, stage: 'Screening' },
-                      { t: 'Founding Engineer', c: 'Attio', s: 76, stage: 'Saved' },
-                    ].map((r) => (
-                      <div className="mockup-row" key={r.t}>
-                        <div className="mockup-fit" style={{ borderColor: r.s >= 80 ? 'var(--success)' : 'var(--warning)', color: r.s >= 80 ? 'var(--success)' : 'var(--warning)' }}>
-                          {r.s}
+                  <div className="studio-chat">
+                    <div className="studio-bubble-agent">
+                      Score this Senior Product Engineer posting against my profile, flag gaps, and draft a tailored cover letter intro.
+                    </div>
+                    <div className="studio-bubble-status">
+                      Bragit scored the role at 87/100 — strong skill match, one gap in Rust. Drafted 4 targeted intro variations and queued a follow-up reminder for Thursday.
+                    </div>
+                  </div>
+                  <div className="studio-input">
+                    <Sparkles size={14} />
+                    <span className="studio-input-spacer">Ask Bragit to score, draft, or triage…</span>
+                    <Paperclip size={14} />
+                    <button className="studio-input-submit" aria-label="Send"><ArrowUp size={14} /></button>
+                  </div>
+                </div>
+                {/* Right: Video + Timeline */}
+                <div className="studio-right">
+                  <div className="studio-video">
+                    <span className="studio-video-label">Live preview</span>
+                    <div className="studio-cursor">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#36B5A2" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4l7 16 2-7 7-2z" />
+                      </svg>
+                      <span className="studio-cursor-pill">Bragit AI</span>
+                    </div>
+                  </div>
+                  <div className="studio-timeline">
+                    <div className="studio-tl-top">
+                      <button className="studio-play" aria-label="Play"><Play size={13} fill="currentColor" /></button>
+                      <span className="studio-time tabular-nums">00:04.2 / 00:15.0</span>
+                    </div>
+                    <div className="studio-tracks">
+                      <div className="studio-track-row">
+                        <span className="studio-track-label">Video</span>
+                        <div className="studio-track-lane">
+                          <div className="studio-seg studio-seg-video" style={{ left: '0%', width: '38%' }} />
+                          <div className="studio-seg studio-seg-video" style={{ left: '42%', width: '28%' }} />
+                          <div className="studio-seg studio-seg-video" style={{ left: '74%', width: '24%' }} />
                         </div>
-                        <div className="mockup-job">
-                          <span className="mockup-job-title">{r.t}</span>
-                          <span className="mockup-job-co">{r.c}</span>
-                        </div>
-                        <span className="mockup-stage">{r.stage}</span>
                       </div>
-                    ))}
+                      <div className="studio-track-row">
+                        <span className="studio-track-label">Graphics</span>
+                        <div className="studio-track-lane">
+                          <div className="studio-seg studio-seg-graphics" style={{ left: '6%', width: '62%' }} />
+                          <div className="studio-seg studio-seg-graphics" style={{ left: '72%', width: '24%' }} />
+                        </div>
+                      </div>
+                      <div className="studio-track-row">
+                        <span className="studio-track-label">Captions</span>
+                        <div className="studio-track-lane">
+                          <div className="studio-seg studio-seg-captions" style={{ left: '4%', width: '40%' }} />
+                          <div className="studio-seg studio-seg-captions" style={{ left: '50%', width: '46%' }} />
+                        </div>
+                      </div>
+                      <div className="studio-playhead" />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mockup-statusbar">
-                <span>Profile tuned · {activeStyle} preset loaded</span>
-                <span className="mockup-status-meta">fit engine v2 · live</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features */}
+        {/* Step 5: Bento Feature Grid */}
+        <section id="showcase" className="bento-section">
+          <div className="bento-head">
+            <h2 className="bento-title">Crafted for hunters who refuse to spreadsheet-grind</h2>
+            <p className="bento-sub">Every tool a serious search needs, rendered with the care of a studio app — not a cluttered ATS.</p>
+          </div>
+          <div className="bento-row1">
+            {bentoCards.slice(0, 3).map((c) => (
+              <BentoCard key={c.title} {...c} />
+            ))}
+          </div>
+          <div className="bento-row2">
+            {bentoCards.slice(3).map((c) => (
+              <BentoCard key={c.title} {...c} />
+            ))}
+          </div>
+        </section>
+
+        {/* Features (existing) */}
         <section className="section" id="features">
           <div className="container">
             <div className="section-head">
@@ -326,7 +416,7 @@ export default function LandingPage() {
             <div className="home-pricing">
               <div className="home-price-card">
                 <div className="home-price-name">Free</div>
-                <div className="home-price-tag">$0<span>/mo</span></div>
+                <div className="home-price-tag tabular-nums">$0<span>/mo</span></div>
                 <ul>
                   <li><Check size={15} /> 5 tracked jobs</li>
                   <li><Check size={15} /> 10 active applications</li>
@@ -338,7 +428,7 @@ export default function LandingPage() {
               <div className="home-price-card featured">
                 <div className="home-price-badge">Most popular</div>
                 <div className="home-price-name">Pro</div>
-                <div className="home-price-tag">$9<span>/mo</span></div>
+                <div className="home-price-tag tabular-nums">$9<span>/mo</span></div>
                 <ul>
                   <li><Check size={15} /> Unlimited jobs &amp; applications</li>
                   <li><Check size={15} /> Unlimited document versions</li>
@@ -399,6 +489,67 @@ export default function LandingPage() {
           <div className="footer-copy">© {new Date().getFullYear()} Bragit. All rights reserved.</div>
         </div>
       </footer>
+    </div>
+  )
+}
+
+function BentoCard({ title, desc, visual }: { title: string; desc: string; visual: string }) {
+  return (
+    <div className="bento-card">
+      <div>
+        <h3 className="bento-card-title">{title}</h3>
+        <p className="bento-card-desc">{desc}</p>
+      </div>
+      <div className="bento-visual">
+        {visual === 'captions' && (
+          <div className="bento-caps">
+            <span className="bento-cap-pill">Python</span>
+            <span className="bento-cap-pill active">FastAPI</span>
+            <span className="bento-cap-pill">PostgreSQL</span>
+            <span className="bento-cap-pill">Docker</span>
+            <span className="bento-cap-pill">AWS</span>
+          </div>
+        )}
+        {visual === 'split' && (
+          <div className="bento-split">
+            <div className="bento-split-pane" />
+            <div className="bento-split-pane" />
+          </div>
+        )}
+        {visual === 'waveform' && (
+          <div className="bento-waveform">
+            {[20, 40, 30, 60, 80, 45, 70, 90, 55, 35, 65, 50, 75, 40, 85, 30, 60, 45, 70, 25, 55, 80, 40, 65].map((h, i) => (
+              <div
+                key={i}
+                className={`bento-wave-bar${i >= 8 && i <= 14 ? ' active' : ''}`}
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+        )}
+        {visual === 'pipeline' && (
+          <div className="bento-pipeline">
+            <span className="bento-pipe-step done">Saved</span>
+            <span className="bento-pipe-arrow">→</span>
+            <span className="bento-pipe-step done">Applied</span>
+            <span className="bento-pipe-arrow">→</span>
+            <span className="bento-pipe-step">Interview</span>
+            <span className="bento-pipe-arrow">→</span>
+            <span className="bento-pipe-step">Offer</span>
+          </div>
+        )}
+        {visual === 'score' && (
+          <div>
+            <div className="bento-score">
+              <span className="bento-score-num tabular-nums">87</span>
+              <span className="bento-score-label">/ 100 fit score</span>
+            </div>
+            <div className="bento-score-bar">
+              <div className="bento-score-fill" style={{ width: '87%' }} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
